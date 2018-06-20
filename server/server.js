@@ -10,28 +10,19 @@ const app = express();
 const server = http.createServer(app);
 const io =socketIO(server);
 
+const {generateMessage}=require('./utils/message.js')
+
 io.on('connection',(socket)=>{
     console.log('New User Connected');
 
 
-    socket.emit('newMessage',{
-      from:'Admin',
-      text:'Welcome',
-      createdAt:new Date().getTime()
-    });
-    socket.broadcast.emit('newMessage',{
-      from:'Admin',
-      text:'New USer joined',
-      createdAt:new Date().getTime()
-    });
+    socket.emit('newMessage',generateMessage('Admin','Welcome'));
+    socket.broadcast.emit('newMessage',generateMessage('Admin','New User Joined'));
 
-    socket.on('createMessage',(message)=>{
+    socket.on('createMessage',(message,callback)=>{
       console.log('createMessage',message);
-      io.emit('newMessage',{
-        from:message.from,
-        text:message.text,
-        createdAt:new Date().getTime()
-      });
+      io.emit('newMessage',generateMessage(message.from,message.text));
+      callback('Because you are always wrong');
 
     });
 
